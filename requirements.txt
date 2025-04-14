@@ -1,0 +1,12 @@
+streamlit
+python-dotenv
+pandas
+google-generativeai
+neo4j
+requests
+langchain-core
+langchain-experimental
+langchain-google-genai
+langchain-neo4j
+pyvis
+Pillow
