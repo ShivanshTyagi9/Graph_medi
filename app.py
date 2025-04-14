@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import pandas as pd
-from dotenv import load_dotenv
 import google.generativeai as genai
 from neo4j import GraphDatabase, basic_auth
 import requests
@@ -15,7 +14,6 @@ from PIL import Image
 import streamlit.components.v1 as components
 
 # Load environment variables
-load_dotenv()
 
 # Gemini & Neo4j configuration
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
