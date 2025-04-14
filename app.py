@@ -118,7 +118,7 @@ def validate_prescription(disease, drug):
         driver.close()
         return is_valid
 
-def fetch_graph_data(limit=100):
+def fetch_graph_data(limit):
     query = """
     MATCH (n)-[r]->(m)
     RETURN DISTINCT n,r,m
@@ -267,7 +267,6 @@ def fetch_graph_data2(limit=1):
     query = """
     MATCH (n)-[r]->(m)
     RETURN DISTINCT n, r, m
-    LIMIT $limit
     """
     try:
         with GraphDatabase.driver(NEO4J_URI3, auth=(NEO4J_USERNAME3, NEO4J_PASSWORD3)) as driver:
@@ -424,7 +423,7 @@ if page == "Knowledge Graph":
         st.markdown("### Click the button below to load interactive sample Knowledge Graph from Neo4j AuraDb.")
         limit = st.number_input("Set Limit for Graph Data", min_value=1, max_value=1000, value=100, step=10)
         if st.button("🔍 Load Graph"):
-            graph_data = fetch_graph_data2(limit=limit)
+            graph_data = fetch_graph_data(limit=limit)
             if graph_data:
                 #print(f"Graph Data: {graph_data}")
                  graph_html = render_knowledge_graph(graph_data)
