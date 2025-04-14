@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
+from dotenv import load_dotenv
 import google.generativeai as genai
 from neo4j import GraphDatabase, basic_auth
 import requests
@@ -14,6 +15,7 @@ from PIL import Image
 import streamlit.components.v1 as components
 
 # Load environment variables
+load_dotenv()
 
 # Gemini & Neo4j configuration
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -52,7 +54,7 @@ graph_transformer = LLMGraphTransformer(llm=llm)
 def clear_graph():
     query = "MATCH (n) DETACH DELETE n"
     try:
-        with GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD)) as driver:
+        with GraphDatabase.driver(NEO4J_URI3, auth=(NEO4J_USERNAME3, NEO4J_PASSWORD3)) as driver:
             with driver.session(database="neo4j") as session:
                 session.run(query)
                 print("Graph data cleared.")
@@ -118,7 +120,7 @@ def validate_prescription(disease, drug):
         driver.close()
         return is_valid
 
-def fetch_graph_data(limit):
+def fetch_graph_data(limit=100):
     query = """
     MATCH (n)-[r]->(m)
     RETURN DISTINCT n,r,m
@@ -340,8 +342,8 @@ if page == "Medical Assistant":
     user_id = st.text_input("User ID", value="demo_user")
     city = st.text_input("Enter your city for weather-aware suggestions")
 
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
+    if "conversation_history" not in st.session_state:
+        st.session_state.conversation_history = {}
 
     user_message = st.text_area("Describe your symptoms")
 
@@ -384,7 +386,7 @@ if page == "Medical Assistant":
             
 
             # Chat history tracking
-            history = conversation_history.get(user_id, [])
+            history = st.session_state.conversation_history.get(user_id, [])
             history.append({"role": "user", "parts": [f"{user_message}\n\n{context_text}"]})
             if len(history) > 6:
                 history = history[-6:]
@@ -402,7 +404,7 @@ if page == "Medical Assistant":
                 response = model.generate_content(full_prompt)
                 assistant_reply = response.text
                 history.append({"role": "model", "parts": [assistant_reply]})
-                conversation_history[user_id] = history
+                st.session_state.conversation_history[user_id] = history
 
                 # Show response
                 st.markdown("### 💬 Assistant Response")
@@ -423,7 +425,7 @@ if page == "Knowledge Graph":
         st.markdown("### Click the button below to load interactive sample Knowledge Graph from Neo4j AuraDb.")
         limit = st.number_input("Set Limit for Graph Data", min_value=1, max_value=1000, value=100, step=10)
         if st.button("🔍 Load Graph"):
-            graph_data = fetch_graph_data(limit=limit)
+            graph_data = fetch_graph_data()
             if graph_data:
                 #print(f"Graph Data: {graph_data}")
                  graph_html = render_knowledge_graph(graph_data)
