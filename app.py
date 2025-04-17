@@ -18,8 +18,7 @@ import streamlit.components.v1 as components
 load_dotenv()
 
 # Gemini & Neo4j configuration
-genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-model = genai.GenerativeModel("gemini-2.0-flash")
+
 
 NEO4J_URI = st.secrets["NEO4J_URI"]
 NEO4J_USERNAME = st.secrets["NEO4J_USERNAME"]
@@ -30,9 +29,12 @@ NEO4J_PASSWORD2=st.secrets["NEO4J_PASSWORD3"]
 NEO4J_URI3=st.secrets["NEO4J_URI3"]
 NEO4J_USERNAME3 =st.secrets["NEO4J_USERNAME3"]
 NEO4J_PASSWORD3 =st.secrets["NEO4J_PASSWORD3"]
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 EMBEDDING_MODEL = "models/text-embedding-004"
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+
+genai.configure(api_key=GOOGLE_API_KEY)
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 conversation_history = {}
 
@@ -110,7 +112,7 @@ def get_weather(city: str):
 
 def validate_prescription(disease, drug):
         driver = GraphDatabase.driver(NEO4J_URI2, auth=basic_auth(NEO4J_USERNAME2, NEO4J_PASSWORD2))
-        with driver.session(database="neo4j") as session:
+        with driver.session(database="neo4j2") as session:
             result = session.run("""
                 MATCH (d:Disease {name: $disease})-[:TREATED_BY]->(dr:Drug {name: $drug})
                 RETURN count(*) > 0 AS is_valid
