@@ -427,7 +427,7 @@ if page == "Knowledge Graph":
         st.markdown("### Click the button below to load interactive sample Knowledge Graph from Neo4j AuraDb.")
         limit = st.number_input("Set Limit for Graph Data", min_value=1, max_value=1000, value=100, step=10)
         if st.button("🔍 Load Graph"):
-            graph_data = fetch_graph_data()
+            graph_data = fetch_graph_data(limit=limit)
             if graph_data:
                 #print(f"Graph Data: {graph_data}")
                  graph_html = render_knowledge_graph(graph_data)
